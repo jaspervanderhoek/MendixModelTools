@@ -3,7 +3,7 @@ import subprocess, random, os, shutil, json, urllib.request, os.path, tarfile
 svnRepo = "https://teamserver.sprintr.com/44fc890d-9a19-4afc-8e0a-29768a2b97e1/trunk"
 svnRev = 100
 svnUser = "jasper.van.der.hoek@mendix.com"
-svnPass = "@3Wesdxc"
+svnPass = ""
 
 
 
