@@ -1,0 +1,1 @@
+This folder is used to for all temporary SVN export folders.
