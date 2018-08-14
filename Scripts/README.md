@@ -1,4 +1,4 @@
-# Mendix Pythong Build Script
+# Mendix Python Build Script
 This script is capable of creating an svn export of your teamserver repository and then create an mda file based on this export. 
 The script will automatically attempt to download the required mxbuild file
 
