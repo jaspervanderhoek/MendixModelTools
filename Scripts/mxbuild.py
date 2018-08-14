@@ -1,19 +1,19 @@
-import subprocess, random, os, shutil, json, urllib.request, os.path, tarfile, argparse, platform, glob
+import subprocess, random, os, shutil, json, urllib.request, os.path, tarfile, argparse, platform, glob, sys
 
 ## Setup all input arguments 
 parser = argparse.ArgumentParser(description='Automatically export the latest revision and build an .mda  using mxbuild.' ) 
 parser.add_argument('-java', action="store", dest="java", help='the Java home directory: \r\n   (Usually \'/usr/lib/jvm/java-8-oracle\' or \'C:\Program Files\Java\jdk1.8.0_144\')')
 
-parser.add_argument('-t', action="store", dest="svnTeamServer", help='The url of your teamserver repository, including the development line. Generally: \'https://teamserver.sprintr.com/44fc890d-9a19-4afc-8e0a-29768a2b97e1/trunk\' ')
-parser.add_argument('-u', action="store", dest="svnUser", help='Your Username used to sign in on the TeamServer (and modeler) ')
-parser.add_argument('-p', action="store", dest="svnPass", help='Your Password used to sign in on the TeamServer (and modeler) ')
-parser.add_argument('-r', action="store", dest="svnRevision", type=int, default=-1, help='The revision you want to build, defaults to the latest revision ')
+parser.add_argument('-teamserver', '-t', action="store", dest="svnTeamServer", help='The url of your teamserver repository, including the development line. Generally: \'https://teamserver.sprintr.com/44fc890d-9a19-4afc-8e0a-29768a2b97e1/trunk\' ')
+parser.add_argument('-user', '-u', action="store", dest="svnUser", help='Your Username used to sign in on the TeamServer (and modeler) ')
+parser.add_argument('-password','-p', action="store", dest="svnPass", help='Your Password used to sign in on the TeamServer (and modeler) ')
+parser.add_argument('-revision','-r', action="store", dest="svnRevision", type=int, default=-1, help='The revision you want to build, defaults to the latest revision ')
 
-parser.add_argument('-m', action="store", dest="mpr", help='Optionally specify the file name of the mpr file, if you have multiple mpr files this argument is mandarory')
-parser.add_argument('-o', action="store", dest="output", help='The path, including the filename where the .mda should be exported')
-parser.add_argument('-v', action="store", dest="version", help='Tag the build revision with this specific version number, without only an mda is created. By adding this version a tag will be added too')
+parser.add_argument('-mprName','-m', action="store", dest="mpr", help='Optionally specify the file name of the mpr file, if you have multiple mpr files this argument is mandarory')
+parser.add_argument('-outputFile','-o', action="store", dest="output", help='The path, including the filename where the .mda should be exported')
+parser.add_argument('-version','-v', action="store", dest="version", help='Tag the build revision with this specific version number, without only an mda is created. By adding this version a tag will be added too')
 
-parser.add_argument('-debug', action="store", dest="debug", default=False, help='Enable debug logging')
+parser.add_argument('-debug', '-d', action="store", dest="debug", default=False, help='Enable debug logging')
 
 args = parser.parse_args()
 
@@ -88,11 +88,13 @@ def exportSVNFolder(repo, revision, username, password):
 	clCmd = "svn export {}".format( buildSVNclCmd(repo, revision, username, password, targetFolder) )
 	debug( "Running script : " + clCmd )
 		
-	p = subprocess.Popen( clCmd, stdout=subprocess.PIPE, shell=True)
-	(output, err) = p.communicate()
+	try:
+		p = subprocess.Popen( clCmd, stdout=subprocess.PIPE, shell=True)
+		(output, err) = p.communicate()
+	except Exception as e:
+		print( "Unable to create an SVN export, is this a valid Mendix repository? \r\n")
+		sys.exit(-1)
 	
-	#debug("Revision is", output)
-
 	return targetFolder
 ### End exportSVNFolder()
 
@@ -116,8 +118,9 @@ def tagRevision( repo, revision, username, password, version ):
 			debug( "Runnning script: " + clCmd )
 			p = subprocess.Popen( clCmd, stdout=subprocess.PIPE, shell=True)
 			(output, err) = p.communicate()
-		except e: 
+		except Exception as e: 
 			print( "Unable to create version tag: [{}] because of error: {}".format( " \"{}/tags/{}/\"".format( repo[0:firstSlashAfterPrjId], version), e ) )
+			
 ### End tagRevision()
 
 
@@ -132,7 +135,13 @@ def getSVNMetaVersion(repo, revision, username, password):
 	output = output.decode("utf-8") 
 	debug( "Retrieved metadata: " + output)
 
-	return json.loads(output)['ModelerVersion']
+	try:
+		modelVersion = json.loads(output)['ModelerVersion']
+	except Exception as e:
+		print( "Unable to find Mendix version information, is this a valid Mendix repository? \r\n")
+		sys.exit(-1)
+	
+	return modelVersion
 ### End getSVNMetaVersion()
 
 
@@ -155,7 +164,7 @@ def getMxBuildFiles( mxVersion ):
 		tar = tarfile.open( _mxLibraryDirectory + targetMxBuildZip )
 		tar.extractall( targetMxBuild )
 		tar.close()
-		os.unlink( targetMxBuildZip )
+		os.unlink( _mxLibraryDirectory + targetMxBuildZip )
 		debug("MxBuild extracted to " + targetMxBuild )
 		
 	# We already have the MxBuild files, so nothing to do here
