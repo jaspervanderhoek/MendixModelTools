@@ -194,13 +194,17 @@ def buildMendixDeploymentArchive(  mxBuildFolder, javaLocation, mprFile, outputF
 		idx2 = mprFile.rfind("\\")
 		idx = max( idx, idx2 )
 		
-		if( not version is None ):		outputFile = _buildOutputDirectory + "{}-{}.mda".format( mprFile[idx:len(mprFile)-4], version )
-		else:										outputFile = _buildOutputDirectory + "{}.mda".format( mprFile[idx:len(mprFile)-4] )
+		if( not version is None ):		
+			outputFile = _buildOutputDirectory + "{}-{}.mda".format( mprFile[idx:len(mprFile)-4], version )
+			version_tag = " --model-version=\"{}\" ".format( version )
+		else:
+			outputFile = _buildOutputDirectory + "{}.mda".format( mprFile[idx:len(mprFile)-4] )
+			version_tag = ""
 	
 	elif ( not "/" in outputFile and not "\\" in outputFile ):
 		outputFile = _buildOutputDirectory + outputFile
 	
-	buildCL = "{}/modeler/mxbuild.exe \"{}\" --java-home=\"{}\" --java-exe-path=\"{}\" --output=\"{}\" ".format( mxBuildFolder, mprFile, javaLocation, javaExeLocation, outputFile )
+	buildCL = "{}/modeler/mxbuild.exe \"{}\" --java-home=\"{}\" --java-exe-path=\"{}\" {} --output=\"{}\" ".format( mxBuildFolder, mprFile, javaLocation, javaExeLocation, version_tag, outputFile )
 	debug( "Running script : " + buildCL )
 	
 	p = subprocess.Popen( buildCL,  shell=True)
