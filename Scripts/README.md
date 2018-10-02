@@ -10,12 +10,12 @@ This script is built on python and has the following prerequisites:
 
 Example 1, export Revision 100 and tag as version 1.0.0
 
-` > python .\mxbuild.py -t "https://teamserver.sprintr.com/[ProjectId]/trunk" -u "email@mendix.com" -p "[Password]" -java "C:/Program Files/Java/jdk1.8.0_144/" -v "1.0.0" -r100
+ > python .\mxbuild.py -t "https://teamserver.sprintr.com/[ProjectId]/trunk" -u "email@mendix.com" -p "[Password]" -java "C:/Program Files/Java/jdk1.8.0_144/" -v "1.0.0" -r100
 
 
 Example 1, export the latest Revision, untagged
 
-` > python .\mxbuild.py -t "https://teamserver.sprintr.com/[ProjectId]/trunk" -u "email@mendix.com" -p "[Password]" -java "C:/Program Files/Java/jdk1.8.0_144/"
+ > python .\mxbuild.py -t "https://teamserver.sprintr.com/[ProjectId]/trunk" -u "email@mendix.com" -p "[Password]" -java "C:/Program Files/Java/jdk1.8.0_144/"
 
 
 It is also possible to start the script without any parameters, the script will then prompt you for all mandatory values. For running this as part of the CICD pipeline you should run the script with the arguments as per the example. In the CICD pipeline it's not recommended to use debugging, but this can be enabled by adding the argument "-debug=True"
