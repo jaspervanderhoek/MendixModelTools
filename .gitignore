@@ -3,3 +3,16 @@ Scripts/mxLib/*
 Scripts/exports/*
 Scripts/builds/*
 Scripts/buildreport.txt
+BP_PublishComplexRestServices/javasource/*/proxies/*
+BP_PublishComplexRestServices/javasource/system/
+BP_PublishComplexRestServices/javasource/core/
+BP_PublishComplexRestServices/javasource/com/
+BP_PublishComplexRestServices/deployment/
+BP_PublishComplexRestServices/.project
+BP_PublishComplexRestServices/.classpath
+*.launch
+*.tmp
+*.lock
+*.bak
+.idea/
+*DS_Store*
