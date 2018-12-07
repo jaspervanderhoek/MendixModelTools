@@ -26,19 +26,25 @@ Well even easier, if you use the [template module](https://github.com/jaspervand
 
 
 ## Traceability  
+In case your consumers are having issues you want to be able to trace why and where your service was behaving different than expected. This starts by being able to identify unique requests. You can try and do that with timestamps too, but imagine with all the different timezones between systems, and the systems might even be a few minutes apart. All-in-all timestamps are difficult to track accross systems.   
+This template uses a hash as the ResponseId, these hashes are 36 characters and fairly unique. They could be generated twice, but it's almost impossible that the same hash is generated twice around the same timeframe.   
+Using these hashes we can trace back the individual response. 
+
+Logging can be enabled too. You'd place the log activitie immediately before each end-event the action 'LogResponse' is called. This will asynchronously log the information about this response. For most applications this information will suffice, but if you want to log more you could choose to customize: 'LogResponseFromJava'. Keep in mind that the more you evaluate and log the more capacity it requires of your server.  
+
 
 
 ## Development Speed & Consistency  
-
-
-
+TODO  
+  
+  
 ## Security  
 TODO  
-
+  
 ## Versioning  
 TODO  
-
-
+  
+  
 # The Template  
 This best-practices is demonstrated through two modules. The "RestWrapper" and "DataModule" modules are both provided as an mpk file for your use.  
 The "RestWrapper" is a starter module to help you quickly setup your published rest service. This module should not be considered an 'Appstore Module' meaning that this is NOT a readonly module and you are encouraged to rename and customize it to integrate with your own functionality.  
