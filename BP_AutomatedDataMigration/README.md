@@ -25,6 +25,7 @@ Automating these actions in a specific sequence makes these migration steps a lo
 
 ## How to automate the migration activities
 This folder holds an example on how you can achieve this. (Note: copy this logic into your own admin module and use it as a quick-start)
+Download the module mpk here: https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_AutomatedDataMigration/dist/DataMigrationTemplate_v1.0.0.mpk
 
 The domain model has 1 entity with 2 attributes. This entity is a Singleton, that means you should only have 1 instance of this in your database. 
   If you have a multi-tenant solution, you can customize this. Setup a 1-* assocation between your tenant and the MigrationTracker and customize the FindAndCreate microflow. Doing this allows you to customize and time the migration separately for each tenant. 
