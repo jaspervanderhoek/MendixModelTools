@@ -29,6 +29,7 @@ Download the module mpk here: https://github.com/jaspervanderhoek/MendixModelToo
 
 The domain model has 1 entity with 2 attributes. This entity is a Singleton, that means you should only have 1 instance of this in your database. 
   If you have a multi-tenant solution, you can customize this. Setup a 1-* assocation between your tenant and the MigrationTracker and customize the FindAndCreate microflow. Doing this allows you to customize and time the migration separately for each tenant. 
+![Domain Model](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_AutomatedDataMigration/dist/Documentation/Entity.png)
 
 All your migration logic should be placed in the microflow: ASu_EvaluateAndRunDataMigration
 This microflow first retrieves the migration tracker and based on the stored DataVersion the microflow can execute specific migration activities. 
@@ -36,3 +37,5 @@ With this simple microflow you can execute your migration logic sequentially.
 
 ### Development priniciples
 To get the most out of this concept always immediately design the migration logic. That means that as soon as you change your domain model, add logic to convert the data on your local machine. If all developers consistently add their migration steps in the correct sequence in this logic it becomes significantly easier to move the software version to production.
+
+![After startup microflow](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_AutomatedDataMigration/dist/Documentation/ASu_EvaluateAndRunDataMigration.png)
