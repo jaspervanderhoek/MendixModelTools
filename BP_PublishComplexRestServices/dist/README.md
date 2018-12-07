@@ -12,17 +12,17 @@ Yes a 500 server exception will let the caller know he didn't provide the right 
 Think about how you can communicate validation messages and make sure you don't need to rewrite your entire mapping and message definition to accomodate this. 
 
 Luckily we're working with the Mendix Platform, which already takes care of a lot of the basic validation. When your service gets called the platform will check that you are receiving JSON. Also if all field and parameters are of the expected types. For example if you publish an integer parameter and you pass a string Mendix will return an error message explaining which value is incorrect. 
-![Type Error](https://github.com/jaspervanderhoek/MendixModelTools/tree/master/BP_PublishComplexRestServices/dist/Documentation/SwaggerError_TypeCheck.png)
+![Type Error](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/Documentation/SwaggerError_TypeCheck.png)
 
 But we can't only rely on the platform for data validation. If you publish an integer, do you accept negative numbers? What if parameters aren't provided, how do you want to let the caller know about this?
 
 You can accomodate this through a simple Response & error entity structure. The image below shows the domain model that exactly matches the standard error response from the platform. This is important because we as Mendix developers know about what the platform does and what we built in a microflow, but we don't need the consuming system to know about it. 
 So making the exact same Json response will allow the consumer to only expect 1 type of error response:
-![Domain with error message](https://github.com/jaspervanderhoek/MendixModelTools/tree/master/BP_PublishComplexRestServices/dist/Documentation/DomainModel_ResponseValidation.png)
+![Domain_Model](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/Documentation/DomainModel_ResponseValidation.png)
 
 To use this entity structure you only need to create the error and response entity, populate them with the response of your choice, transform to Json and you're done. 
-Well even easier, if you use the template module you can just call the microflow "CreateSimpleErrorResponse" and it will take care of that for you:
-![Microflow_CreateSimpleErrorResponse](https://github.com/jaspervanderhoek/MendixModelTools/tree/master/BP_PublishComplexRestServices/dist/Documentation/Microflow_CreateSimpleErrorResponse.png)
+Well even easier, if you use the [template module](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/RestWrapperExample_v0.1.0.mpk) you can just call the microflow "CreateSimpleErrorResponse" and it will take care of that for you:
+![Microflow_CreateSimpleErrorResponse](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/Documentation/Microflow_CreateSimpleErrorResponse.png)
 
 
 * Security
