@@ -80,5 +80,32 @@ If you don't need paging you can remove these 2 activities, the 'Create Variable
 
 
 ![Microflow_ExamplePublishedService](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/Documentation/Microflow_Example02.png)
+This next section is all custom for your application, you can retrieve and validate the data as you see fit. If you use paging, this is where you would pull the offset and PageSize from the response entity. The values will be set correctly at this point. If you want to have validations here you can add them too.
+
 
 ![Microflow_ExamplePublishedService](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/Documentation/Microflow_Example03.png)
+Close off the microflow by finalizing the paging. Based on the offset, pagesize, and total nr of records that are applicable within the constraints this subflow will create the paging entity and populate all the fields correctly. After calling this subflow, if you need paging you will have an instance of the 'paging' and 'PageToken' entity. You don't need to do anything with this anymore, besides making sure that your response mapping and message definition allow this data to be returned.
+
+Logging is enabled in this microflow too, immediately before each end-event the action 'LogResponse' is called. This will asynchronously log the information about this response. For most applications this information will suffice, but if you want to log more you could choose to customize: 'LogResponseFromJava'. Keep in mind that the more you evaluate and log the more capacity it requires of your server.
+
+
+### Error Codes (Types)
+To allow the developers to gain better insight in why your service is returning an error, it's often best to be explicit about the error that you are generating. 
+The enumeration 'StatusCode' allows you to have flexibility and consistency. There are already several status codes defined, for the different cases. The caption of these errors will be used in the status response. Additionally this enumeration will also determine the http status code that is returned. When you add or change the enumeration values you'll notice that the microflow: 'GetStatusCode_ByErrorCode' needs to be updated. You can technically choose any status code here, but try to conform with the HTTP Status codes: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes (It's important to not make up your own numbers, pick a status code that matches best with your error)
+
+Add as many enumeration values as you need but try and keep it consistent. 
+
+It's also good to document the different error codes that you have. In the example 'DataModule' the service documentation contains a table with all error codes. It's good practice to disclose this information somewhere in your service too, this can be on the service or for the individual operations.
+
+Below is the example syntax:   
+``` 
+# Error Codes:
+
+Error Description | Status Code | Cause
+---------- | ------------- | --------
+Not Found | 200 | Based on the parameters no records could be located
+Invalid Parameter | 400 | One or more of the required parameters isn't provided or correct
+Invalid Authorization | 401 | The credentials that were used don't have access to this operation
+Server Exception | 500 | An unexpected error has occured, contact the system administrator for more details
+````
+
