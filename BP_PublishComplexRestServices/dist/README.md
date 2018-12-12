@@ -34,7 +34,10 @@ Logging can be enabled too. You'd place the log activitie immediately before eac
 
 
 ## Development Speed & Consistency  
-TODO  
+By following the example structure you create a consistent repetative structure. With the structure from the example microflow you can quickly develop your services with consistend functionality and behavior for both your co-developers and consumers.  
+With services looking and working the same way it becomes eassier for you and your co-worker to support each others work. By using this module you can create your own template that can be duplicated for each new operation that you want to publish.  
+
+Consistency is important for whomever consumes your services. How often did you complain when calling inconsistent and undocumented APIs? Don't be that person that builds that, even if your documentation is lacking as long as all the Operations have the same structure and response codes implementing your service should be easy.  
   
   
 ## Security  
