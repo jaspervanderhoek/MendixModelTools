@@ -33,13 +33,27 @@ Using these hashes we can trace back the individual response.
 Logging can be enabled too. You'd place the log activitie immediately before each end-event the action 'LogResponse' is called. This will asynchronously log the information about this response. For most applications this information will suffice, but if you want to log more you could choose to customize: 'LogResponseFromJava'. Keep in mind that the more you evaluate and log the more capacity it requires of your server.  
 
 
-
 ## Development Speed & Consistency  
 TODO  
   
   
 ## Security  
-TODO  
+Always run your published microflow with entity access enabled, this will make sure you don't accidentally expose unwanted information. This also forces you to setup the right security model and hide any records and fields the user shouldn't be able see. Always setup your security as if the user account can access all information directly through the API..... because that is possible.  
+Any system user can setup a session and read or write any data that is accessisble to them through the API.
+
+Always create a separate service user account, that has no UI access and has as little access to entities as is possible to run the service.  
+
+With entity access enabled on your published service, and the bare minimum access exposed to your user you will notice at some point to run your microflow logic your service user needs more access than previously configured. You could change the access rules, but better is to move your logic to a subflow and run that subflow without entity access enabled.  
+You can see this in the example microflow. The microflow runs with instance access, the service user does not have read/write access to the paging and token entities. To successfully create those records a subflow is called to return the data to the user. 
+
+ * Run all published microflows with entity access enabled
+ * Create separate user and module roles for your service account(s)
+ * Limit the access of the service accounts to the bare possible minimum  
+    The minimum generally is:
+    * Read access to the output parameters, try and use non-persistent entities or an instance access xpath rule to limit exposure
+    * Always use Non-persistent entities for complex input parameters  
+      If for any reason you'd need your real persistent entity as input parameter, then enable the 'System.Owner' property and add an instance access rule that your service account can only read/write entities where "[system.owner='[%CurrentUser%]']"
+
   
 ## Versioning  
 TODO  
