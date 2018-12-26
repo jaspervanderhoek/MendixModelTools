@@ -1,28 +1,32 @@
-# Publishing Rest (or SOAP) Services, what to keep in mind
-Microservices and integrations are everywhere, each system needs to be connected to each other. Which means you need to create more and more APIs. But APIs can create dependencies, and when you have a system that is depending on your API you can't just change it anymore. If you've been developing software long enough you have run into the problem that you really should change a service but can't anymore because other systems are using it. Or you have to rebuild most of your logic because you forgot to add a places to put validation rules, or security, or paging through large data sets.  
-Most of these problems can be prevented by using the right structure. This best-practice and [template module](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/RestWrapperExample_v0.1.0.mpk) are created so that you don't have to reinvent what we've already thought off.  
+# Publishing Rest (or SOAP) Services, what to keep in mind  
+
+Microservices and integrations are everywhere, each system needs to be connected to each other. Which means you need to create more and more APIs. But APIs can create dependencies, and when you have a system that is depending on your API any change you make can impact the downstream systems. If you've been developing software long enough you've probably found yourself in the situation that you have to make a change of a service that impacts the depending systems, now you have to make the decision to rebuild most of your logic or coordinate a combined release of the two systems. Both choices are less than ideal, so why not spend a little bit of extra time and make sure your structure is flexible enough to support most changes.  
+Most autonomy problems can be prevented by using the right structure. This best-practice and [template module](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/RestWrapperExample_v0.1.0.mpk) are created so that you don't have to reinvent what we've already thought off.  
 
 This page will talk you through the concepts that you need to keep in mind when publishing services. For each topic you'll find that the template module already contains a solution or place to accommodate the challenges.  
+This page does not talk about optimizing the functionality of your service. For more information about the best and fastest ways to model your service's logic please see the performance guidelines.  
 
 
 ## Validation & Consistency  
 When exposing services you can have simple services that have no or just primitive parameters, but as soon as you introduce intelligence or complex structures to the input of your service you need to be able to validate and provide a response.  
-Yes a 500 server exception will let the caller know he didn't provide the right information, but it's not very helpful. Just like with your application UX you also should focus on creating a good DX (Developer Experience) when working with your service.  
+When your microflow receives bad data you'd either get an exception and your client gets a 500 server exception, or no data at all. The caller now knows he didn't provide the right information, but it's not very helpful. Just like with your application UX you also should focus on creating a good DX (Developer Experience) when working with your service.  
 
 Think about how you can communicate validation messages and make sure you don't need to rewrite your entire mapping and message definition to accommodate this.  
 
-Luckily we're working with the Mendix Platform, which already takes care of a lot of the basic validation. When your service gets called the platform will check that you are receiving JSON. Also if all field and parameters are of the expected types. For example if you publish an integer parameter and you pass a string Mendix will return an error message explaining which value is incorrect.  
+Luckily we're working with the Mendix Platform which already takes care of a lot of the basic validation. When your service gets called the platform will check that you are receiving valid JSON and if all fields and parameters are of the expected data types. For example if you publish an integer parameter and you pass a string Mendix will return an error message explaining which value is incorrect.  
 ![Type Error](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/Documentation/SwaggerError_TypeCheck.png)
 
-But we can't only rely on the platform for data validation. If you publish an integer, do you accept negative numbers? What if parameters aren't provided, how do you want to let the caller know about this?  
+We can't only rely on the platform for data validation. If you publish an integer, do you accept negative numbers? What if parameters aren't provided, how do you want to let the caller know about this?  
 
 You can accommodate this through a simple Response & error entity structure. The image below shows the domain model that exactly matches the standard error response from the platform. This is important because we as Mendix developers know about what the platform does and what we built in a microflow, but we don't need the consuming system to know about it.   
-So making the exact same Json response will allow the consumer to only expect 1 type of error response:  
+So making the exact same JSON response will allow the consumer to only expect 1 type of error response:  
 ![Domain_Model](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/Documentation/DomainModel_ResponseValidation.png)
 
-To use this entity structure you only need to create the error and response entity, populate them with the response of your choice, transform to Json and you're done.  
-Well even easier, if you use the [template module](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/RestWrapperExample_v0.1.0.mpk) you can just call the microflow "CreateSimpleErrorResponse" and it will take care of that for you:  
-![Microflow_CreateSimpleErrorResponse](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/Documentation/Microflow_CreateSimpleErrorResponse.png)
+To use this entity structure you need to create an instance of the error and response entity, populate them with the response content of your choice, transform to JSON and you're done.  
+To make this even easier, you can use the [template module](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/RestWrapperExample_v0.1.0.mpk) and call the microflow "CreateSimpleErrorResponse" which will create the necessary JSON response for you:  
+![Microflow_CreateSimpleErrorResponse](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/Documentation/Microflow_CreateSimpleErrorResponse.png)  
+  
+As part of this response we are including an 'ErrorCode' / 'StatusCode' variable. This is an enumeration that you should customize for your needs. Your error codes should return a functional description to the consumer along with a http status code that matches the IETF standard, see the "Error Codes (Types)" section further below on this page. 
 
 
 ## Traceability  
@@ -41,10 +45,10 @@ Consistency is important for whomever consumes your services. How often did you 
   
   
 ## Security  
-Always run your published microflow with entity access enabled, this will make sure you don't accidentally expose unwanted information. This also forces you to setup the right security model and hide any records and fields the user shouldn't be able see. Always setup your security as if the user account can access all information directly through the API..... because that is possible.  
-Any system user can setup a session and read or write any data that is accessible to them through the API.
+Always run your published microflow with entity access enabled, this will make sure you don't accidentally expose unwanted information. This also forces you to setup the right security model and hide any records and fields the user shouldn't be able see. Always setup your security model to allow the least access as possible, even if you might not have pages or APIs published to expose the other entities. Through the standard Mendix client APIs it's possible to retrieve any entity you have access to. Always check and make sure you don't have provide unnecessary read/write/delete access.   
+Any Mendix user can login on the Mendix Platform through the web-client API and read or write all data that made accessible through the module roles security, even if there are no pages or custom APIs for those entities.
 
-Always create a separate service user account, that has no UI access and has as little access to entities as is possible to run the service.  
+For system-to-system communication always create a separate service user account. This account should have no UI access and has as little access to entities as is possible to run the service (you can limit this to just the input and output parameters).  
 
 With entity access enabled on your published service, and the bare minimum access exposed to your user you will notice at some point to run your microflow logic your service user needs more access than previously configured. You could change the access rules, but better is to move your logic to a sub flow and run that sub-flow without entity access enabled.  
 You can see this in the example microflow. The microflow runs with instance access, the service user does not have read/write access to the paging and token entities. To successfully create those records a sub-flow is called to return the data to the user. 
@@ -113,8 +117,9 @@ Logging is enabled in this microflow too, immediately before each end-event the 
 
 
 ### Error Codes (Types)
-To allow the developers to gain better insight in why your service is returning an error, it's often best to be explicit about the error that you are generating. 
-The enumeration 'StatusCode' allows you to have flexibility and consistency. There are already several status codes defined, for the different cases. The caption of these errors will be used in the status response. Additionally this enumeration will also determine the http status code that is returned. When you add or change the enumeration values you'll notice that the microflow: 'GetStatusCode_ByErrorCode' needs to be updated. You can technically choose any status code here, but try to conform with the HTTP Status codes: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes (It's important to not make up your own numbers, pick a status code that matches best with your error)
+To allow the developers to gain better insight in why your service is returning an error, it's often best to be explicit about all functional errors that you are generating.  
+The enumeration 'StatusCode' allows you to have flexibility and consistency through all services. There are a few status codes defined as an example. It is recommended to extend this enumeration with all functional errors and codes for your service, an example of this could be: 401 - "Customer’s subscription has expired" or 400 - "Customer doesn't have a configured payment method".  
+The enumeration caption will be used in the status response. Additionally this enumeration will also determine the http status code that is returned. When you add or change the enumeration values you'll notice that the microflow: 'GetStatusCode_ByErrorCode' needs to be updated. You can technically choose any status code here, but try to conform with the HTTP Status codes: https://en.wikipedia.org/wiki/List_of_HTTP_status_codes (It's important to not make up your own numbers, pick a status code that matches best with your error)
 
 Add as many enumeration values as you need but try and keep it consistent. 
 
@@ -127,8 +132,10 @@ Below is the example syntax:
 Error Description | Status Code | Cause
 ---------- | ------------- | --------
 Not Found | 200 | Based on the parameters no records could be located
-Invalid Parameter | 400 | One or more of the required parameters isn't provided or correct
+Unauthorized | 401 | Customer’s subscription has expired
+Invalid Configuration | 400 | Customer doesn't have a configured payment method
 Invalid Authorization | 401 | The credentials that were used don't have access to this operation
+Invalid Parameter | 400 | One or more of the required parameters isn't provided or correct
 Server Exception | 500 | An unexpected error has occurred, contact the system administrator for more details
 ````
 
