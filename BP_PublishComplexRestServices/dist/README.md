@@ -1,9 +1,10 @@
 # Publishing Rest (or SOAP) Services, what to keep in mind  
 
-Microservices and integrations are everywhere, each system needs to be connected to each other. Which means you need to create more and more APIs. But APIs can create dependencies, and when you have a system that is depending on your API any change you make can impact the downstream systems. If you've been developing software long enough you've probably found yourself in the situation that you have to make a change of a service that impacts the depending systems, now you have to make the decision to rebuild most of your logic or coordinate a combined release of the two systems. Both choices are less than ideal, so why not spend a little bit of extra time and make sure your structure is flexible enough to support most changes.  
-Most autonomy problems can be prevented by using the right structure. This best-practice and [template module](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/RestWrapperExample_v0.1.0.mpk) are created so that you don't have to reinvent what we've already thought off.  
+Microservices and integrations are everywhere, and each system needs to be connected to each other, which means you need to create more and more APIs. But APIs can create dependencies, and when you have a system that is depending on your API any change you make can impact the downstream systems. If you've been developing software long enough you've probably found yourself in the situation that you have to make a change of a service that impacts the depending systems, now you have to make the decision to rebuild most of your logic or coordinate a combined release of the two systems. Both choices are less than ideal, so why not spend a little bit of extra time and make sure your structure is flexible enough to support most changes.  
+Most autonomy problems can be prevented by using the right structure. This best-practice and [template module](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/RestWrapperExample_v0.1.0.mpk) are created so that you don't have to reinvent what we've already thought of.  
 
 This page will talk you through the concepts that you need to keep in mind when publishing services. For each topic you'll find that the template module already contains a solution or place to accommodate the challenges.  
+
 This page does not talk about optimizing the functionality of your service. For more information about the best and fastest ways to model your service's logic please see the performance guidelines.  
 
 
@@ -13,7 +14,7 @@ When your microflow receives bad data you'd either get an exception and your cli
 
 Think about how you can communicate validation messages and make sure you don't need to rewrite your entire mapping and message definition to accommodate this.  
 
-Luckily we're working with the Mendix Platform which already takes care of a lot of the basic validation. When your service gets called the platform will check that you are receiving valid JSON and if all fields and parameters are of the expected data types. For example if you publish an integer parameter and you pass a string Mendix will return an error message explaining which value is incorrect.  
+Luckily we're working with the Mendix Platform, which already takes care of a lot of the basic validation. When your service gets called the platform will check that you are receiving valid JSON and if all fields and parameters are of the expected data types. For example if you publish an integer parameter and you pass a string Mendix will return an error message explaining which value is incorrect.  
 ![Type Error](https://github.com/jaspervanderhoek/MendixModelTools/raw/master/BP_PublishComplexRestServices/dist/Documentation/SwaggerError_TypeCheck.png)
 
 We can't only rely on the platform for data validation. If you publish an integer, do you accept negative numbers? What if parameters aren't provided, how do you want to let the caller know about this?  
@@ -126,16 +127,16 @@ Add as many enumeration values as you need but try and keep it consistent.
 It's also good to document the different error codes that you have. In the example 'DataModule' the service documentation contains a table with all error codes. It's good practice to disclose this information somewhere in your service too, this can be on the service or for the individual operations.
 
 Below is the example syntax:   
-``` 
+
 # Error Codes:
 
 Error Description | Status Code | Cause
----------- | ------------- | --------
+---------- | :-----------:| --------
 Not Found | 200 | Based on the parameters no records could be located
 Unauthorized | 401 | Customer’s subscription has expired
 Invalid Configuration | 400 | Customer doesn't have a configured payment method
 Invalid Authorization | 401 | The credentials that were used don't have access to this operation
 Invalid Parameter | 400 | One or more of the required parameters isn't provided or correct
 Server Exception | 500 | An unexpected error has occurred, contact the system administrator for more details
-````
+
 
