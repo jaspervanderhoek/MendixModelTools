@@ -16,3 +16,4 @@ Scripts/buildreport.txt
 *.bak
 .idea/
 *DS_Store*
+*/GPUCache/
